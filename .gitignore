@@ -12,3 +12,4 @@ docs/
 
 # Dotenv file
 .env
+falcon-py-modified/__pycache__/*
