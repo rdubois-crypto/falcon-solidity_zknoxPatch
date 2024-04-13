@@ -2,10 +2,10 @@
 pragma solidity ^0.8.25;
 
 library Falcon {
-    uint256 n = 512;
-    uint256 sigBound = 34034726;
-    uint256 sigBytesLen = 666;
-    uint256 q = 12289;
+    uint256 constant n = 512;
+    uint256 constant sigBound = 34034726;
+    uint256 constant sigBytesLen = 666;
+    uint256 constant q = 12289;
 
     struct PublicKey {
         int256[512] h;
@@ -13,6 +13,14 @@ library Falcon {
     struct Signature {
         bytes salt;
         int256[512] s1;
+    }
+
+    function splitToHex(bytes32 x) public pure returns (uint16[16] memory) {
+        uint16[16] memory res;
+        for (uint i = 0; i < 16; i++) {
+            res[i] = uint16(uint256(x) >> (i * 16));
+        }
+        return res;
     }
 
     function hashToPoint(
@@ -23,9 +31,9 @@ library Falcon {
     }
 
     function verify(
-        bytes msgs,
+        bytes memory msgs,
         Signature memory signature
     ) public pure returns (address) {
-        hashed = self.hash_to_point(msgs, signature.salt);
+        int256[512] memory hashed = hashToPoint(msgs, signature.salt);
     }
 }
