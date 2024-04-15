@@ -264,7 +264,7 @@ class SecretKey:
             rep += print_tree(self.T_fft, pref="")
         return rep
 
-    def hash_to_point(self, message, salt):
+    def hash_to_point(self, salt, message):
         """
         Hash a message to a point in Z[x] mod(Phi, q).
         Inspired by the Parse function from NewHope.
@@ -281,17 +281,16 @@ class SecretKey:
         # Output pseudorandom bytes and map them to coefficients.
         hashed = [0 for i in range(n)]
         i = 0
-        j = 0
         while i < n:
             # Takes 2 bytes, transform them in a 16 bits integer
             twobytes = shake.read(2)
             # elt = (twobytes[0] << 8) + twobytes[1]  # This breaks in Python 2.x
-            elt = int(twobytes[0], 16)
+            elt = int(twobytes, 16)
+            print(twobytes, elt)
             # Implicit rejection sampling
             if elt < k * q:
                 hashed[i] = elt % q
                 i += 1
-            j += 1
         return hashed
 
     def sample_preimage(self, point, seed=None):

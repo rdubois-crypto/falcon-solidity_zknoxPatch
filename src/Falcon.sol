@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.25;
+import {Test, console} from "forge-std/Test.sol";
 
 library Falcon {
     uint256 constant n = 512;
@@ -18,22 +19,43 @@ library Falcon {
     function splitToHex(bytes32 x) public pure returns (uint16[16] memory) {
         uint16[16] memory res;
         for (uint i = 0; i < 16; i++) {
-            res[i] = uint16(uint256(x) >> (i * 16));
+            res[i] = uint16(uint256(x) >> ((15 - i) * 16));
         }
         return res;
     }
 
     function hashToPoint(
-        bytes memory msgHash,
-        bytes memory salt
-    ) public pure returns (int256[512] memory) {
-        // TODO: wait for shake256 from dilithium repo
+        bytes memory salt,
+        bytes memory msgHash
+    ) public view returns (uint256[512] memory hashed) {
+        uint i = 0;
+        uint j = 0;
+        bytes32 tmp = keccak256(abi.encodePacked(salt, msgHash));
+        console.logBytes32(tmp);
+        uint16[16] memory sample = splitToHex(tmp);
+        uint k = (1 << 16) / q;
+        uint kq = k * q;
+        while (i < n) {
+            if (j == 16) {
+                tmp = keccak256(abi.encodePacked(tmp));
+                sample = splitToHex(tmp);
+                j = 0;
+            }
+            console.logUint(sample[j]);
+            if (sample[j] < kq) {
+                // console.logUint(sample[j]);
+                hashed[i] = sample[j] % q;
+                i++;
+            }
+            j++;
+        }
+        return hashed;
     }
 
     function verify(
         bytes memory msgs,
         Signature memory signature
-    ) public pure returns (address) {
-        int256[512] memory hashed = hashToPoint(msgs, signature.salt);
+    ) public view returns (address) {
+        uint256[512] memory hashed = hashToPoint(msgs, signature.salt);
     }
 }
