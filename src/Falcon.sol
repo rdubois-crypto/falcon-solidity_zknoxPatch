@@ -31,7 +31,7 @@ contract Falcon {
 
     function hashToPoint(
         bytes memory salt,
-        bytes memory msgHash
+        bytes memory msgHash,
     ) public view returns (uint256[512] memory hashed) {
         uint i = 0;
         uint j = 0;
@@ -57,8 +57,25 @@ contract Falcon {
 
     function verify(
         bytes memory msgs,
-        Signature memory signature
+        Signature memory signature,
+        PublicKey memory publicKey
     ) public view returns (address) {
         uint256[512] memory hashed = hashToPoint(msgs, signature.salt);
+        uint256[512] memory s0 = ntt.subZQ(hashed, ntt.mulZQ(signature.s1, publicKey.h));
+        uint qs1 = 6144; // q >> 1;
+        // normalize s0 // to positive cuz you'll **2 anyway?
+        for (uint i = 0; i < n; i++) {
+            if s0[i] > qs1 {
+                s0[i] = q - s0[i];
+            }else{
+                s0[i] = s0[i];
+            }
+        }
+        uint norm = 0;
+        for (uint i = 0; i < n; i++) {
+            norm += s0[i] * s0[i];
+            norm += s1[i] * s1[i];
+        }
+        assert(norm < sigBound, "Signature is invalid");
     }
 }
