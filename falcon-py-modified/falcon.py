@@ -286,7 +286,6 @@ class SecretKey:
             twobytes = shake.read(2)
             # elt = (twobytes[0] << 8) + twobytes[1]  # This breaks in Python 2.x
             elt = int(twobytes, 16)
-            print(twobytes, elt)
             # Implicit rejection sampling
             if elt < k * q:
                 hashed[i] = elt % q
