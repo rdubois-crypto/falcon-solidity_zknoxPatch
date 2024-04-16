@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.25;
+import {Test, console} from "forge-std/Test.sol";
 
 // TODO: make it a library (aka unfuck constants/data)
 contract NTT {
@@ -22,7 +23,9 @@ contract NTT {
         uint[] memory res = new uint[](p.length);
         if (p.length > 2) {
             // split p into p0 and p1
-            (uint[] memory p0, uint[] memory p1) = splitNTT(p);
+            uint[] memory p0 = new uint[](p.length / 2);
+            uint[] memory p1 = new uint[](p.length / 2);
+            (p0, p1) = splitNTT(p);
             // compute iNTT(p0) and iNTT(p1)
             p0 = iNTT(p0);
             p1 = iNTT(p1);
@@ -105,6 +108,7 @@ contract NTT {
         for (uint i = 0; i < a.length; i++) {
             res[i] = mulmod(a[i], b[i], q);
         }
+        return res;
     }
 
     function subZQ(
