@@ -9,9 +9,7 @@ contract Falcon {
     uint256 constant sigBytesLen = 666;
     uint256 constant q = 12289;
     NTT ntt;
-    struct PublicKey {
-        int256[512] h;
-    }
+    
     struct Signature {
         bytes salt;
         int256[512] s1;
@@ -58,10 +56,10 @@ contract Falcon {
     function verify(
         bytes memory msgs,
         Signature memory signature,
-        PublicKey memory publicKey
+        uint[512] memory h // public key
     ) public view returns (address) {
         uint256[512] memory hashed = hashToPoint(msgs, signature.salt);
-        uint256[512] memory s0 = ntt.subZQ(hashed, ntt.mulZQ(signature.s1, publicKey.h));
+        uint256[512] memory s0 = ntt.subZQ(hashed, ntt.mulZQ(signature.s1, h));
         uint qs1 = 6144; // q >> 1;
         // normalize s0 // to positive cuz you'll **2 anyway?
         for (uint i = 0; i < n; i++) {
