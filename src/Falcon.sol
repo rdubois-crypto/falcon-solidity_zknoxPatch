@@ -9,7 +9,7 @@ contract Falcon {
     uint256 constant sigBytesLen = 666;
     uint256 constant q = 12289;
     NTT ntt;
-    
+
     struct Signature {
         bytes salt;
         int256[512] s1;
@@ -29,7 +29,7 @@ contract Falcon {
 
     function hashToPoint(
         bytes memory salt,
-        bytes memory msgHash,
+        bytes memory msgHash
     ) public view returns (uint256[512] memory hashed) {
         uint i = 0;
         uint j = 0;
@@ -63,16 +63,16 @@ contract Falcon {
         uint qs1 = 6144; // q >> 1;
         // normalize s0 // to positive cuz you'll **2 anyway?
         for (uint i = 0; i < n; i++) {
-            if s0[i] > qs1 {
+            if (s0[i] > qs1) {
                 s0[i] = q - s0[i];
-            }else{
+            } else {
                 s0[i] = s0[i];
             }
         }
         uint norm = 0;
         for (uint i = 0; i < n; i++) {
             norm += s0[i] * s0[i];
-            norm += s1[i] * s1[i];
+            norm += signature.s1[i] * signature.s1[i];
         }
         assert(norm < sigBound, "Signature is invalid");
     }
