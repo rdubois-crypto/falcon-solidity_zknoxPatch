@@ -35,4 +35,4 @@ enc_s = sig[HEAD_LEN + SALT_LEN:]
 s1 = decompress(enc_s, sk.sig_bytelen - HEAD_LEN - SALT_LEN, sk.n)
 
 sk.hash_to_point(
-    0xc5b40c2770a332209f89d5c4f110360ee88b310f55c6c70af501ee383a7ce472dbbd3effa056ac97, b"falcon in sol now?")
+    salt, b"falcon in sol now?")
